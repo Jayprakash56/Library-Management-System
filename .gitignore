@@ -1,0 +1,16 @@
+# Ignore node_modules and dist from both client and server
+library-app/node_modules/
+library-app/dist/
+library-server/node_modules/
+library-server/dist/
+
+# Ignore env files
+library-server/.env
+*.env
+
+# Logs
+*.log
+
+# OS/IDE files
+.DS_Store
+.vscode/
