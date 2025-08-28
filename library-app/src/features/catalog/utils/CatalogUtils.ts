@@ -1,5 +1,5 @@
 import type { Book } from "../../../models/Book";
-import type { PageInfo } from "../../../models/page";
+import type { PageInfo } from "../../../models/page.ts";
 
 export function generateRandomGenres(): string[] {
   const choices = ['Non-Fiction', 'Childrens', 'Fantasy', 'Fiction', 'Biography', 'Romance', 'Science Fiction', 'Young Adult'];

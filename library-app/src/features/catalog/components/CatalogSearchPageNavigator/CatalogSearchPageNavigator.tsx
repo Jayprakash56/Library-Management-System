@@ -1,4 +1,3 @@
-import React, {useState} from 'react';
 import './CatalogSearchPageNavigator.css';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../../redux/ReduxStore';

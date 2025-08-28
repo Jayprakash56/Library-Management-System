@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import type { Book, CheckinBookPayload, CheckoutBookPayload } from "../../models/Book";
-import type { PageInfo } from "../../models/Page";
+import type { PageInfo } from "../../models/page";
 
 
 const API = axios.create({

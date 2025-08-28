@@ -12,7 +12,7 @@ export const CatalogOverview:React.FC = () => {
   const bookState = useSelector((state: RootState) => state.book);
   const dispatch: AppDispatch = useDispatch();
 
-  const [genres, setGenres] = useState<string[]>(() => {
+  const [genres] = useState<string[]>(() => {
     return generateRandomGenres();
   })
   

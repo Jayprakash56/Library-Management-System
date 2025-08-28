@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import { useEffect} from 'react';
 import HomePage from './pages/HomePage/HomePage';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from './redux/ReduxStore';

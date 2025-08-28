@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { useDispatch, type UseDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import './UpdateUserForm.css';
 import type { AppDispatch, RootState } from "../../../../redux/ReduxStore";
