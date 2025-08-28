@@ -1,10 +1,11 @@
-import {createAsyncThunk, createSlice, type PayloadAction} from '@reduxjs/toolkit';
-
+import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import axios from 'axios';
 import type { FetchUserPayload, LoginUserPayload, RegisterUserPayload, User } from '../../models/User';
 
-import axios from 'axios';
-import { AssistWalkerOutlined, FamilyRestroom } from '@mui/icons-material';
-import { useFormAction } from 'react-router-dom';
+// ✅ Create API instance with base URL from .env
+const API = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+});
 
 interface AuthenticationSliceState {
   loggedInUser: User | undefined;
@@ -18,20 +19,33 @@ interface AuthenticationSliceState {
 const initialState: AuthenticationSliceState = {
   loggedInUser: undefined,
   profileUser: undefined,
-  libraryCard: "",
+  libraryCard: '',
   loading: false,
   error: false,
-  registerSuccess: false
-}
+  registerSuccess: false,
+};
 
+// ✅ Async Thunks
 export const loginUser = createAsyncThunk(
   'auth/login',
-  async(user: LoginUserPayload, thunkAPI) => {
+  async (user: LoginUserPayload, thunkAPI) => {
     try {
-      const req = await axios.post('http://localhost:8000/auth/login', user);
-      return req.data.user;
-    } catch(error) {
-      return thunkAPI.rejectWithValue(error.response?.data || {message: error.message});
+      const res = await API.post('/auth/login', user);
+      return res.data.user;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || { message: error.message });
+    }
+  }
+);
+
+export const registerUser = createAsyncThunk(
+  'auth/register',
+  async (user: RegisterUserPayload, thunkAPI) => {
+    try {
+      const res = await API.post('/auth/register', user);
+      return res.data.user;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Registration failed');
     }
   }
 );
@@ -40,207 +54,102 @@ export const fetchUser = createAsyncThunk(
   'auth/fetch',
   async (payload: FetchUserPayload, thunkAPI) => {
     try {
-      const req = await axios.get(`http://localhost:8000/users/${payload.userId}`);
-      const user = req.data.user;
+      const res = await API.get(`/users/${payload.userId}`);
       return {
-        user,
-        property: payload.property
-      }
-    } catch(e) {
-      return thunkAPI.rejectWithValue(e);
-    }
-  }
-)
-
-export const updateUser = createAsyncThunk(
-  'auth/update',
-  async(payload:User, thunkAPI) => {
-    try {
-      const req = await axios.put('http://localhost:8000/users', payload);
-      return req.data.updatedUser;
-    } catch(e) {
-      return thunkAPI.rejectWithValue(e);
-    }
-  }
-)
-
-export const getLibraryCard = createAsyncThunk(
-  'auth/libraryCard',
-  async (userId:string, thunkAPI) => {
-    try {
-      const req = await axios.post("http://localhost:8000/card/", {user: userId});
-      return req.data.libraryCard;
-    } catch(e) {
-      return thunkAPI.rejectWithValue(e);
-    }
-  }
-)
-
-export const registerUser = createAsyncThunk(
-  'auth/register',
-  async (user: RegisterUserPayload, thunkAPI) => {
-    try {
-      const req = await axios.post('http://localhost:8000/auth/register', user);
-      return req.data.user;
-    } catch(error) {
-      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Registration failed');
+        user: res.data.user,
+        property: payload.property,
+      };
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || { message: error.message });
     }
   }
 );
 
+export const updateUser = createAsyncThunk(
+  'auth/update',
+  async (payload: User, thunkAPI) => {
+    try {
+      const res = await API.put('/users', payload);
+      return res.data.updatedUser;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || { message: error.message });
+    }
+  }
+);
+
+export const getLibraryCard = createAsyncThunk(
+  'auth/libraryCard',
+  async (userId: string, thunkAPI) => {
+    try {
+      const res = await API.post('/card/', { user: userId });
+      return res.data.libraryCard;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data || { message: error.message });
+    }
+  }
+);
+
+// ✅ Slice
 export const AuthenticationSlice = createSlice({
-  name: "authentication",
+  name: 'authentication',
   initialState,
   reducers: {
     resetRegisterSuccess(state) {
-      state = {
-        ...state,
-        registerSuccess: false,
-      }
-      return state;
-    }, 
+      state.registerSuccess = false;
+    },
     resetUser(state, action: PayloadAction<string>) {
-      state = {
-        ...state,
-        [action.payload]: undefined
-      }
-      return state;
-    }
+      (state as any)[action.payload] = undefined;
+    },
   },
   extraReducers: (builder) => {
-    //pending logic
-    builder.addCase(loginUser.pending, (state, action) => {
-      state = {
-        ...state, 
-        error: false,
-        loading: true
-      }
-      return state;
-    })
+    const setPending = (state: AuthenticationSliceState) => {
+      state.loading = true;
+      state.error = false;
+    };
+    const setRejected = (state: AuthenticationSliceState) => {
+      state.loading = false;
+      state.error = true;
+    };
 
-    builder.addCase(registerUser.pending, (state, action) => {
-      state = {
-        ...state,
-        error: false,
-        loading: true
-      }
-      return state;
-    })
+    builder
+      // ✅ Pending states
+      .addCase(loginUser.pending, setPending)
+      .addCase(registerUser.pending, setPending)
+      .addCase(fetchUser.pending, setPending)
+      .addCase(updateUser.pending, setPending)
+      .addCase(getLibraryCard.pending, setPending)
 
-    builder.addCase(fetchUser.pending, (state, action) => {
-      state = {
-        ...state,
-        error: false,
-        loading: true
-      }
-      return state;
-    })
+      // ✅ Fulfilled states
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.loggedInUser = action.payload;
+      })
+      .addCase(registerUser.fulfilled, (state) => {
+        state.loading = false;
+        state.registerSuccess = true;
+      })
+      .addCase(fetchUser.fulfilled, (state, action) => {
+        state.loading = false;
+        (state as any)[action.payload.property] = action.payload.user;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.loggedInUser = action.payload;
+        state.profileUser = action.payload;
+      })
+      .addCase(getLibraryCard.fulfilled, (state, action) => {
+        state.loading = false;
+        state.libraryCard = action.payload._id;
+      })
 
-    builder.addCase(updateUser.pending, (state, action) => {
-      state = {
-        ...state,
-        error: false,
-        loading: true
-      }
-      return state;
-    })
-
-    builder.addCase(getLibraryCard.pending, (state, action) => {
-      state = {
-        ...state,
-        error: false,
-        loading: true
-      }
-      return state;
-    })
-    
-    //resolved logic
-    builder.addCase(loginUser.fulfilled, (state, action) => {
-      state = {
-        ...state,
-        loading: false,
-        loggedInUser: action.payload
-      }
-      return state;
-    });
-
-    builder.addCase(registerUser.fulfilled, (state, action) => {
-      state = {
-        ...state,
-        error: false,
-        loading: false,
-        registerSuccess: true
-      }
-      return state;
-    })
-
-    builder.addCase(fetchUser.fulfilled, (state, action) => {
-      state = {
-        ...state,
-        [action.payload.property]: action.payload.user,
-        loading: false
-      }
-      return state;
-    })
-
-    builder.addCase(updateUser.fulfilled, (state, action) => {
-      state = {
-        ...state,
-        loggedInUser: action.payload,
-        profileUser: action.payload,
-        loading: false
-      }
-
-      return state;
-    })
-
-    builder.addCase(getLibraryCard.fulfilled, (state, action) => {
-      state = {
-        ...state,
-        loading: false,
-        libraryCard: action.payload._id
-      }
-      return state;
-    })
-
-    //rejected logic
-    builder.addCase(loginUser.rejected, (state, action) => {
-      state = {
-        ...state,
-        error: true,
-        loading: false
-      }
-      return state;
-    })
-
-    builder.addCase(registerUser.rejected, (state, action) => {
-      state = {
-        ...state,
-        error: true,
-        loading: false
-      }
-      return state;
-    })
-
-    builder.addCase(fetchUser.rejected, (state, action) => {
-      state = {
-        ...state,
-        error: true,
-        loading: false
-      }
-      return state;
-    })
-
-    builder.addCase(updateUser.rejected, (state, action) => {
-      state = {
-        ...state,
-        error: true,
-        loading: false
-      }
-      return state;
-    })
-  }
+      // ✅ Rejected states
+      .addCase(loginUser.rejected, setRejected)
+      .addCase(registerUser.rejected, setRejected)
+      .addCase(fetchUser.rejected, setRejected)
+      .addCase(updateUser.rejected, setRejected)
+      .addCase(getLibraryCard.rejected, setRejected);
+  },
 });
 
-export const {resetRegisterSuccess, resetUser} = AuthenticationSlice.actions;
+export const { resetRegisterSuccess, resetUser } = AuthenticationSlice.actions;
 export default AuthenticationSlice.reducer;
