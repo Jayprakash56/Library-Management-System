@@ -7,6 +7,6 @@ const router = express.Router();
 router.get('/', LoanRecordController.getAllRecord);
 router.post('/', ValidateSchema(Schemas.loan.create, 'body') , LoanRecordController.createRecord);
 router.put('/', ValidateSchema(Schemas.loan.update, 'body') ,LoanRecordController.updateRecord);
-router.post('/loan/query', ValidateSchema(Schemas.loan.query, 'body') , LoanRecordController.getRecordByProperty);
+router.post('/', ValidateSchema(Schemas.loan.query, 'body') , LoanRecordController.getRecordByProperty);
 
 export = router;
