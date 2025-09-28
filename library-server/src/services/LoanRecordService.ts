@@ -54,9 +54,25 @@ export async function findAllRecords(): Promise<ILoanRecordModel[]> {
   }
 }
 
+// export async function queryRecords(params:{property: string, value: string | Date}):Promise<ILoanRecordModel[]> {
+//   try {
+//     return await LoanRecordDao.find({[params.property]: params.value}).populate("item").sort("-loanedDate");
+//   } catch(error) {
+//     throw error;
+//   }
+// }
 export async function queryRecords(params:{property: string, value: string | Date}):Promise<ILoanRecordModel[]> {
   try {
-    return await LoanRecordDao.find({[params.property]: params.value}).populate("item").sort("-loanedDate");
+    let filter: any = {};
+    if (["patron", "employeeOut", "employeeIn", "item"].includes(params.property)) {
+      filter[params.property] = new mongoose.Types.ObjectId(params.value as string);
+    } else {
+      filter[params.property] = params.value;
+    }
+
+    return await LoanRecordDao.find(filter)
+      .populate("item")
+      .sort("-loanedDate");
   } catch(error) {
     throw error;
   }
