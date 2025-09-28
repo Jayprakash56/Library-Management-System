@@ -59,6 +59,11 @@ export async function findAllRecords(): Promise<ILoanRecordModel[]> {
 export async function queryRecords(params:{property: string, value: string | Date}):Promise<ILoanRecordModel[]> {
   try {
     console.log(params);
+    if(!mongoose.Types.ObjectId(params.value)) {
+      throw new Error('Invalid object ID');
+    } else {
+      console.log('done');
+    }
     return await LoanRecordDao.find({[params.property]:  new mongoose.Types.ObjectId(params.value)}).populate("item").sort("-loanedDate");
   } catch(error) {
     throw error;
