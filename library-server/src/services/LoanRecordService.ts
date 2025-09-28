@@ -2,6 +2,8 @@ import LoanRecordDao, {ILoanRecordModel} from "../daos/LoanRecordDao";
 import { ILoanRecord } from "../models/loanRecords";
 import { LoanRecordDoesNotExistError } from "../utils/LibraryErrors";
 import { findBookById, modifyBook } from "./BookService";
+//
+import mongoose from "mongoose";
 
 
 
