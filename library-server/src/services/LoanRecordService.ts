@@ -56,7 +56,7 @@ export async function findAllRecords(): Promise<ILoanRecordModel[]> {
   }
 }
 
-export async function queryRecords(params:{property: string, value: string | Date | ObjectId }):Promise<ILoanRecordModel[]> {
+export async function queryRecords(params:{property: string, value: string | Date}):Promise<ILoanRecordModel[]> {
   try {
     console.log(params);
     const objVal = new mongoose.Types.ObjectId(params.value);
