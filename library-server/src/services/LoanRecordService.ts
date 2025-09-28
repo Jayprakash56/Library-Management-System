@@ -3,7 +3,7 @@ import { ILoanRecord } from "../models/loanRecords";
 import { LoanRecordDoesNotExistError } from "../utils/LibraryErrors";
 import { findBookById, modifyBook } from "./BookService";
 //
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 
 
 
@@ -56,26 +56,27 @@ export async function findAllRecords(): Promise<ILoanRecordModel[]> {
   }
 }
 
-// export async function queryRecords(params:{property: string, value: string | Date}):Promise<ILoanRecordModel[]> {
-//   try {
-//     return await LoanRecordDao.find({[params.property]: params.value}).populate("item").sort("-loanedDate");
-//   } catch(error) {
-//     throw error;
-//   }
-// }
 export async function queryRecords(params:{property: string, value: string | Date}):Promise<ILoanRecordModel[]> {
   try {
-    let filter: any = {};
-    if (["patron", "employeeOut", "employeeIn", "item"].includes(params.property)) {
-      filter[params.property] = new mongoose.Types.ObjectId(params.value as string);
-    } else {
-      filter[params.property] = params.value;
-    }
-
-    return await LoanRecordDao.find(filter)
-      .populate("item")
-      .sort("-loanedDate");
+    console.log(params);
+    return await LoanRecordDao.find({[params.property]: params.value}).populate("item").sort("-loanedDate");
   } catch(error) {
     throw error;
   }
 }
+// export async function queryRecords(params:{property: string, value: string | Date}):Promise<ILoanRecordModel[]> {
+//   try {
+//     let filter: any = {};
+//     if (["patron", "employeeOut", "employeeIn", "item"].includes(params.property)) {
+//       filter[params.property] = new mongoose.Types.ObjectId(params.value as string);
+//     } else {
+//       filter[params.property] = params.value;
+//     }
+
+//     return await LoanRecordDao.find(filter)
+//       .populate("item")
+//       .sort("-loanedDate");
+//   } catch(error) {
+//     throw error;
+//   }
+// }
