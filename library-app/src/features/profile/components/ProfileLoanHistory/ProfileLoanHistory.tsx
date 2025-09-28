@@ -35,11 +35,10 @@ export const ProfileLoanHistory:React.FC = () => {
      console.log("user:", user);
     fetchRecordsForUser();
   }, [user])
-
+  console.log(records);
   return (
     <div className="profile-loan-history">
       <h3 className="profile-loan-header">{user?.firstName}'s Item Loan History:</h3>
-      console.log(records);
 
       {records.map((record) => {
         return (
