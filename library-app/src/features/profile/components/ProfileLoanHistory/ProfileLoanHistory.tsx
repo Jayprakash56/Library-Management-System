@@ -24,7 +24,7 @@ export const ProfileLoanHistory:React.FC = () => {
           value: user._id
         });
         let r = res.data.records;
-        console.log(res);
+        console.log(res.data);
         setRecords(r);
       } catch(e) {
         console.error("Error fetching loan records for user:", e);
