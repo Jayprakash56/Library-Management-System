@@ -15,7 +15,7 @@ export const ProfileLoanHistory:React.FC = () => {
   const fetchRecordsForUser = async () => {
     if(user) {
       try {
-        let res = await axios.post('http://localhost:8000/loan/query', {
+        let res = await axios.post(import.meta.env.VITE_API_URL || 'http://localhost:8000/loan/query', {
           property: "patron",
           value: user._id
         });
