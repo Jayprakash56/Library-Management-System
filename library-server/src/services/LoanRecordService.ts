@@ -59,7 +59,7 @@ export async function findAllRecords(): Promise<ILoanRecordModel[]> {
 export async function queryRecords(params:{property: string, value: string | Date}):Promise<ILoanRecordModel[]> {
   try {
     console.log(params);
-    if(!mongoose.Types.ObjectId(params.value)) {
+    if(!mongoose.Types.ObjectId.isValid(params.value)) {
       throw new Error('Invalid object ID');
     } else {
       console.log('done');
